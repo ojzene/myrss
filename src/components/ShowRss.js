@@ -93,10 +93,7 @@ export default function ShowRss() {
     const { data } = useQuery(SETTINGS_QUERY);
     if(data) {
         feedSetting = data.settings[0]
-    }
-    // if (loading) return "Loading...";
-    // if (error) return <pre>{error.message}</pre>
-    
+    } 
     const [updateSetting] = useMutation(UPDATE_SETTING);
     
     const blockStyle = {
@@ -129,7 +126,6 @@ export default function ShowRss() {
         }).then(resp => { 
             responseData = resp.data.updateSetting
             if (responseData) {
-                console.log("updatedSetting::::", responseData);
                 successMessage = true; 
                 setHeaderStyle({
                     fontSize: responseData.headlineFontSize+"px", // Font size of the block
@@ -144,8 +140,7 @@ export default function ShowRss() {
                     borderRadius: "10px",
                     border: "solid 5px white",
                 })
-                alert("Settings successfully updated")
-                
+                alert("Settings successfully updated");
                 setIsOpen(false);
             } 
             else {

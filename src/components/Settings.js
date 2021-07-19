@@ -47,7 +47,6 @@ const UPDATE_SETTING = gql`
 var successMessage = false;
 
 export default function Settings() {
-    // const { data, loading, error } = useQuery(SETTINGS_QUERY);
     const { data } = useQuery(SETTINGS_QUERY);
     var feedSetting = [];
     if(data) {
@@ -85,7 +84,7 @@ export default function Settings() {
         });
 
          setTimeout(() => {
-            console.log("respon message::::::", successMessage);
+            console.log("response message::::::", successMessage);
          }, 1000);
 
     };
@@ -172,9 +171,6 @@ export default function Settings() {
                 <button type="Submit" className="btn">Save Changes</button>
             </div>
         </form>
-        
     </div>
   );
-
-
 }

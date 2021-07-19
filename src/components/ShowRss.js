@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, gql, useMutation } from "@apollo/client";
-
 import Modal from 'react-modal';
-
 import M from "materialize-css/dist/js/materialize.min.js";
 
 const MAX_CONTENT_LENGTH = 150
@@ -63,13 +61,16 @@ const UPDATE_SETTING = gql`
         headlineFontSize,
         headlineColor,
         blockColor,
-        blockBgColor
+        blockBgColor,
+        blockWidth,
+        blockHeight
     }
   }
 `;
 
 var successMessage = false;
  
+
 export default function ShowRss() {
     var responseData = [];
     successMessage = false;
@@ -93,22 +94,31 @@ export default function ShowRss() {
     const { data } = useQuery(SETTINGS_QUERY);
     if(data) {
         feedSetting = data.settings[0]
-    } 
+    }
+    
     const [updateSetting] = useMutation(UPDATE_SETTING);
     
+    var gridColNum = Math.round(Number(feedSetting.blockWidth) / 100);
+    gridColNum = (gridColNum > 12) ? 12 : gridColNum;
+    gridColNum = "col s12 m"+gridColNum
+    
+    const headlineStyle = {
+        fontSize: feedSetting.headlineFontSize+"px",  // Font size of the block
+        backgroundColor: feedSetting.blockBgColor,
+        color: feedSetting.headlineColor, // The color of the headline of the RSS blocks
+        wordWrap: "break-word",
+        textAlign: "center",
+    };
     const blockStyle = {
         fontSize: feedSetting.blockFontSize+"px",  // Font size of the block
         backgroundColor: feedSetting.blockBgColor, // The color of the background of the blocks
         color: feedSetting.blockColor, // The color of the text in the RSS block
-        height: "450px",
+        height: feedSetting.blockHeight+"px",
         borderRadius: "10px",
         border: "solid 5px white",
+        wordWrap: "break-word",
+        overflow: "hidden"
     }
-    const headlineStyle = {
-        fontSize: feedSetting.headlineFontSize+"px",  // Font size of the block
-        backgroundColor: feedSetting.blockBgColor,
-        color: feedSetting.headlineColor // The color of the headline of the RSS blocks
-    };
     
     const submitEdits = (event, idToEdit) => {
         event.preventDefault();
@@ -127,20 +137,29 @@ export default function ShowRss() {
             responseData = resp.data.updateSetting
             if (responseData) {
                 successMessage = true; 
+                
+                gridColNum = Math.round(Number(responseData.blockWidth) / 100);
+                gridColNum = (gridColNum > 12) ? 12 : gridColNum;
+                gridColNum = "col s12 m"+gridColNum
+
                 setHeaderStyle({
-                    fontSize: responseData.headlineFontSize+"px", // Font size of the block
-                    backgroundColor: responseData.blockBgColor,
-                    color: responseData.headlineColor // The color of the headline of the RSS blocks
+                    fontSize: responseData.headlineFontSize+"px", // feedSetting.headlineFontSize+"px",  // Font size of the block
+                    backgroundColor: responseData.blockBgColor, //feedSetting.blockBgColor,
+                    color: responseData.headlineColor, // The color of the headline of the RSS blocks
+                    wordWrap: "break-word",
+                    textAlign: "center" 
                 })
                 setBlockStyle({
                     fontSize: responseData.blockFontSize+"px",  // Font size of the block
                     backgroundColor: responseData.blockBgColor, // The color of the background of the blocks
                     color: responseData.blockColor, // The color of the text in the RSS block
-                    height: "450px",
+                    height: responseData.blockHeight+"px",
                     borderRadius: "10px",
                     border: "solid 5px white",
+                    wordWrap: "break-word",
+                    overflow: "hidden"
                 })
-                alert("Settings successfully updated");
+                alert("Settings successfully updated")
                 setIsOpen(false);
             } 
             else {
@@ -165,10 +184,10 @@ export default function ShowRss() {
         const feed = new window.DOMParser().parseFromString(contents, "text/xml");
         const items = feed.querySelectorAll("item");
         const feedItems = [...items].map((el) => ({
-            link: el.querySelector("link").innerHTML,
-            title: el.querySelector("title").innerHTML,
+            link: el.querySelector("link") ? el.querySelector("link").innerHTML : "",
+            title: el.querySelector("title") ? el.querySelector("title").innerHTML : "",
             image: el.querySelector("enclosure") ? el.querySelector("enclosure").getAttribute('url') : "",
-            description: el.querySelector("description").innerHTML
+            description: el.querySelector("description") ? el.querySelector("description").innerHTML : ""
         }));
         setItems(feedItems);
     };
@@ -192,10 +211,11 @@ export default function ShowRss() {
                     items.map((item) => {
                         return (
                             <>
-                            <div style={setBlock.length === undefined ? blockStyle : setBlock } className="col s12 m12 l4" key="{item}">  
+                            <div style={setBlock.length === undefined ? blockStyle : setBlock } className={gridColNum} key="{item}">  
                                 <img src={item.image} alt={item.title} width="100%" height="200" style={{ display: item.image === "" ? "none" : "block" }} /> 
-                                <div style={setHeader.length === undefined ? headlineStyle :  setHeader }>{item.title}</div>
-                                <p style={{ padding: "10px" }}>{stripTags(stripCTags(trimContent(item.description)))}</p>   
+                                <div style={setHeader.length === undefined ? headlineStyle :  setHeader }>{stripCTags(item.title)}</div>
+                                <p style={{ padding: "10px" }}>{decodeEntities(stripCTags(trimContent(item.description)))}</p>   
+                                <p style={{ padding: "10px" }}><a href={item.link}>{item.link}</a></p>   
                             </div>
                             </>
                         );  
@@ -228,14 +248,16 @@ export default function ShowRss() {
                     name="headlineFontSize"
                     defaultValue={feedSetting.headlineFontSize}
                 />
+
                 <label className="active" htmlFor="firstadd_source_name">Headline Font Size</label>
             </div>
 
             <div className="input-field">
                 <input
+                style={{width: "100%"}}
                 placeholder="Headline Font Color"
                 id="headlineColor"
-                type="text"
+                type="color"
                 defaultValue={feedSetting.headlineColor}
                 />
                 <label className="active" htmlFor="firstadd_source_name">Headline Font Color</label>
@@ -253,9 +275,10 @@ export default function ShowRss() {
 
             <div className="input-field">
                 <input
+                style={{width: "100%"}}
                 placeholder="Block Color"
                 id="blockColor"
-                type="text"
+                type="color"
                 defaultValue={feedSetting.blockColor}
                 />
                 <label className="active" htmlFor="firstadd_source_name">Block Color</label>
@@ -263,9 +286,10 @@ export default function ShowRss() {
 
             <div className="input-field">
                 <input
+                style={{width: "100%"}}
                 placeholder="Block Background Color"
                 id="blockBgColor"
-                type="text"
+                type="color"
                 defaultValue={feedSetting.blockBgColor}
                 />
                 <label className="active" htmlFor="firstadd_source_name">Block Background Color</label>
@@ -300,17 +324,6 @@ export default function ShowRss() {
      </div>
     );
 
-    function stripTags(str, allow) {
-        // making sure the allow arg is a string containing only tags in lowercase (<a><b><c>)
-        allow = (((allow || "") + "").toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
-      
-        var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi;
-        var commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi;
-        return str.replace(commentsAndPhpTags, '').replace(tags, function ($0, $1) {
-          return allow.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
-        });
-    }
-
     function stripCTags(str) {
         // making sure the allow arg is a string containing only tags in lowercase (<a><b><c>)
         return str.replace("<![CDATA[", "").replace("]]>", "");
@@ -329,11 +342,20 @@ export default function ShowRss() {
         setIsOpen(false);
     }
 
+
     function trimContent(snippet) {
         if (snippet.length > MAX_CONTENT_LENGTH) {
           snippet = snippet.substring(0, MAX_CONTENT_LENGTH);
           snippet += " [...]";
         }
         return snippet;
+    }
+
+    function decodeEntities(s){
+        var str, temp= document.createElement('p');
+        temp.innerHTML= s;
+        str= temp.textContent || temp.innerText;
+        temp=null;
+        return str;
     }
 }

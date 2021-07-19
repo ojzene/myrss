@@ -1,11 +1,8 @@
 import React, { useEffect } from "react";
-
 import { Link } from "react-router-dom";
-
 import M from "materialize-css/dist/js/materialize.min.js";
 
 export default function NavBar() {
-  // Initialize sidebar
   useEffect(() => {
     var elem = document.querySelector(".sidenav");
     M.Sidenav.init(elem, {
@@ -29,9 +26,6 @@ export default function NavBar() {
             <li>
               <Link to="/">Your Feed</Link>
             </li>
-            {/* <li>
-          <Link to="/settings">Settings</Link>
-        </li> */}
           </ul>
         </div>
       </nav>
@@ -50,9 +44,6 @@ export default function NavBar() {
         <li>
           <Link to="/">Your Feed</Link>
         </li>
-        {/* <li>
-          <Link to="/settings">Settings</Link>
-        </li> */}
       </ul>
     </>
   );

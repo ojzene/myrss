@@ -29,9 +29,9 @@ export default function NavBar() {
             <li>
               <Link to="/">Your Feed</Link>
             </li>
-            <li>
-              <Link to="/settings">Settings</Link>
-            </li>
+            {/* <li>
+          <Link to="/settings">Settings</Link>
+        </li> */}
           </ul>
         </div>
       </nav>
@@ -50,9 +50,9 @@ export default function NavBar() {
         <li>
           <Link to="/">Your Feed</Link>
         </li>
-        <li>
+        {/* <li>
           <Link to="/settings">Settings</Link>
-        </li>
+        </li> */}
       </ul>
     </>
   );

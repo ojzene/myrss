@@ -1,4 +1,3 @@
-// import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useQuery, gql, useMutation } from "@apollo/client";
 
@@ -71,7 +70,6 @@ const UPDATE_SETTING = gql`
 
 var successMessage = false;
  
-
 export default function ShowRss() {
     var responseData = [];
     successMessage = false;
@@ -134,9 +132,9 @@ export default function ShowRss() {
                 console.log("updatedSetting::::", responseData);
                 successMessage = true; 
                 setHeaderStyle({
-                    fontSize: responseData.headlineFontSize+"px", // feedSetting.headlineFontSize+"px",  // Font size of the block
-                    backgroundColor: responseData.blockBgColor, //feedSetting.blockBgColor,
-                    color: responseData.headlineColor //feedSetting.headlineColor, // The color of the headline of the RSS blocks
+                    fontSize: responseData.headlineFontSize+"px", // Font size of the block
+                    backgroundColor: responseData.blockBgColor,
+                    color: responseData.headlineColor // The color of the headline of the RSS blocks
                 })
                 setBlockStyle({
                     fontSize: responseData.blockFontSize+"px",  // Font size of the block
@@ -336,7 +334,6 @@ export default function ShowRss() {
         setIsOpen(false);
     }
 
-
     function trimContent(snippet) {
         if (snippet.length > MAX_CONTENT_LENGTH) {
           snippet = snippet.substring(0, MAX_CONTENT_LENGTH);
@@ -344,5 +341,4 @@ export default function ShowRss() {
         }
         return snippet;
     }
-
 }

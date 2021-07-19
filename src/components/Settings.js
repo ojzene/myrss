@@ -74,7 +74,6 @@ export default function Settings() {
             }
         }).then(resp => { 
             responseData = resp.data.updateSetting
-            console.log("respon data::::::", resp.data.updateSetting);
             if (responseData) { 
                 successMessage = true; 
                 alert("Settings successfully updated")
@@ -84,7 +83,6 @@ export default function Settings() {
             }
         }).catch((error) => {
             successMessage = false;
-            console.log(error);
         });
 
          setTimeout(() => {
@@ -100,7 +98,7 @@ export default function Settings() {
         {  
            successMessage
         ? (
-          <div>Settings successfully updated </div>  
+          <div>Settings successfully updated   </div>  
         ) : "" }
 
         <form onSubmit={(e) => submitEdits(e, feedSetting._id)}>
